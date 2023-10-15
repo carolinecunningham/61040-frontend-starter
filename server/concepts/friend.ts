@@ -69,6 +69,18 @@ export default class FriendConcept {
     return friendships.map((friendship) => (friendship.user1.toString() === user.toString() ? friendship.user2 : friendship.user1));
   }
 
+  async areUsersFriends(u1: ObjectId, u2: ObjectId) {
+    const friendship = await this.friends.readOne({
+      $or: [
+        { user1: u1, user2: u2 },
+        { user1: u2, user2: u1 },
+      ],
+    });
+    if (!(friendship !== null || u1.toString() === u2.toString())) {
+      throw new UsersNotFriendsError(u1, u2);
+    }
+  }
+
   private async addFriend(user1: ObjectId, user2: ObjectId) {
     void this.friends.createOne({ user1, user2 });
   }
@@ -131,6 +143,15 @@ export class FriendNotFoundError extends NotFoundError {
     public readonly user2: ObjectId,
   ) {
     super("Friendship between {0} and {1} does not exist!", user1, user2);
+  }
+}
+
+export class UsersNotFriendsError extends NotAllowedError {
+  constructor(
+    public readonly user1: ObjectId,
+    public readonly user2: ObjectId,
+  ) {
+    super("{0} and {1} are not friends!", user1, user2);
   }
 }
 
