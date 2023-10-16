@@ -2,9 +2,11 @@ import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
+import FriendView from "../views/FriendsView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
+import ProfileView from "../views/ProfileView.vue";
 import SettingView from "../views/SettingView.vue";
 
 const router = createRouter({
@@ -19,6 +21,18 @@ const router = createRouter({
       path: "/setting",
       name: "Settings",
       component: SettingView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/profile",
+      name: "Profile",
+      component: ProfileView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/friends",
+      name: "Friends",
+      component: FriendView,
       meta: { requiresAuth: true },
     },
     {

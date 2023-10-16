@@ -32,7 +32,13 @@ onBeforeMount(async () => {
       </div>
       <ul>
         <li>
-          <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Home </RouterLink>
+          <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Feed </RouterLink>
+        </li>
+        <li v-if="isLoggedIn">
+          <RouterLink :to="{ name: 'Friends' }" :class="{ underline: currentRouteName == 'Friends' }"> Friends </RouterLink>
+        </li>
+        <li v-if="isLoggedIn">
+          <RouterLink :to="{ name: 'Profile' }" :class="{ underline: currentRouteName == 'Profile' }"> Profile </RouterLink>
         </li>
         <li v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
