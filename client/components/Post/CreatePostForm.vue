@@ -3,12 +3,13 @@ import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const content = ref("");
+const prompt = ref();
 const emit = defineEmits(["refreshPosts"]);
 
-const createPost = async (content: string) => {
+const createPost = async (content: string, prompt: number) => {
   try {
     await fetchy("api/posts", "POST", {
-      body: { content },
+      body: { content, prompt },
     });
   } catch (_) {
     return;
@@ -19,13 +20,20 @@ const createPost = async (content: string) => {
 
 const emptyForm = () => {
   content.value = "";
+  prompt.value = -1;
 };
 </script>
 
 <template>
-  <form @submit.prevent="createPost(content)">
+  <form @submit.prevent="createPost(content, prompt)">
     <label for="content">Post Contents:</label>
     <textarea id="content" v-model="content" placeholder="Create a post!" required> </textarea>
+    <select v-model="prompt">
+      <option id="prompt" value="0">Celebration</option>
+      <option id="prompt" value="1">Life Update</option>
+      <option id="prompt" value="2">Other</option>
+    </select>
+    <!-- use vif to get audience values -->
     <button type="submit" class="pure-button-primary pure-button">Create Post</button>
   </form>
 </template>
