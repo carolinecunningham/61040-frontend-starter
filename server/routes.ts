@@ -41,7 +41,15 @@ class Routes {
 
   @Router.patch("/users")
   async updateUser(session: WebSessionDoc, update: Partial<UserDoc>) {
+    // TODO: why does this not get called
     const user = WebSession.getUser(session);
+    if (update.school) {
+      const usr = await User.getUserById(user);
+      const userId = usr._id;
+      // add users to internal lists for school
+      await Filtering.assignToFilter(update.school, userId);
+      await Filtering.removeFromFilter(usr.school, userId);
+    }
     return await User.update(user, update);
   }
 
@@ -122,6 +130,24 @@ class Routes {
     return await User.idsToUsernames(await Friend.getFriends(user));
   }
 
+  @Router.get("/friends/objects")
+  async getFriendsObs(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const friends = await Friend.getFriends(user);
+    const usernames = await User.idsToUsernames(friends);
+    const result: Record<string, ObjectId> = {};
+    friends.forEach((friend, index) => {
+      result[usernames[index]] = friend;
+    });
+    return result;
+  }
+
+  @Router.get("/friends/ids")
+  async getFriendsIds(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    return await Friend.getFriends(user);
+  }
+
   @Router.delete("/friends/:friend")
   async removeFriend(session: WebSessionDoc, friend: string) {
     const user = WebSession.getUser(session);
@@ -129,34 +155,34 @@ class Routes {
     return await Friend.removeFriend(user, friendId);
   }
 
-  @Router.get("/friend/requests")
+  @Router.get("/friends/requests")
   async getRequests(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     return await Responses.friendRequests(await Friend.getRequests(user));
   }
 
-  @Router.post("/friend/requests/:to")
+  @Router.post("/friends/requests/:to")
   async sendFriendRequest(session: WebSessionDoc, to: string) {
     const user = WebSession.getUser(session);
     const toId = (await User.getUserByUsername(to))._id;
     return await Friend.sendRequest(user, toId);
   }
 
-  @Router.delete("/friend/requests/:to")
+  @Router.delete("/friends/requests/:to")
   async removeFriendRequest(session: WebSessionDoc, to: string) {
     const user = WebSession.getUser(session);
     const toId = (await User.getUserByUsername(to))._id;
     return await Friend.removeRequest(user, toId);
   }
 
-  @Router.put("/friend/accept/:from")
+  @Router.put("/friends/accept/:from")
   async acceptFriendRequest(session: WebSessionDoc, from: string) {
     const user = WebSession.getUser(session);
     const fromId = (await User.getUserByUsername(from))._id;
     return await Friend.acceptRequest(fromId, user);
   }
 
-  @Router.put("/friend/reject/:from")
+  @Router.put("/friends/reject/:from")
   async rejectFriendRequest(session: WebSessionDoc, from: string) {
     const user = WebSession.getUser(session);
     const fromId = (await User.getUserByUsername(from))._id;
@@ -274,7 +300,8 @@ class Routes {
 
     // combine recommended users, prioritize by both school and hometown
 
-    return await Filtering.getRecommendedItems(userID, usersShareSchool, usersShareHometown, maxQuantity);
+    const recItems = await Filtering.getRecommendedItems(userID, usersShareSchool, usersShareHometown, maxQuantity);
+    return Responses.recommendedUsers(recItems);
   }
 
   @Router.put("/filter/recommendedUsers/")

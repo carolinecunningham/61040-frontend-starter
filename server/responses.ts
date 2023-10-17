@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { User } from "./app";
 import { AlreadyFriendsError, FriendNotFoundError, FriendRequestAlreadyExistsError, FriendRequestDoc, FriendRequestNotFoundError } from "./concepts/friend";
 import { PostAuthorNotMatchError, PostDoc } from "./concepts/post";
@@ -24,7 +25,8 @@ export default class Responses {
    */
   static async posts(posts: PostDoc[]) {
     const authors = await User.idsToUsernames(posts.map((post) => post.author));
-    return posts.map((post, i) => ({ ...post, author: authors[i] }));
+    const prompts = posts.map((post) => post.prompt);
+    return posts.map((post, i) => ({ ...post, author: authors[i], prompt: prompts[i] }));
   }
 
   /**
@@ -36,6 +38,14 @@ export default class Responses {
     const to = requests.map((request) => request.to);
     const usernames = await User.idsToUsernames(from.concat(to));
     return requests.map((request, i) => ({ ...request, from: usernames[i], to: usernames[i + requests.length] }));
+  }
+
+  /**
+   * Convert RecommendedUsers into more readable format for the frontend
+   * by converting the ids into usernames.
+   */
+  static async recommendedUsers(users: ObjectId[]) {
+    return User.idsToUsernames(users);
   }
 }
 

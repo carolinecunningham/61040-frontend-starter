@@ -75,7 +75,7 @@ export default class PostConcept {
 
   async isPromptSuppported(prompt: number) {
     if (!(prompt in PostPrompts)) {
-      throw new PromptNotAllowedError(prompt);
+      throw new PromptNotAllowedError();
     }
   }
 
@@ -117,8 +117,8 @@ export class PostAuthorNotMatchError extends NotAllowedError {
 }
 
 export class PromptNotAllowedError extends NotAllowedError {
-  constructor(public readonly prompt: number) {
-    super("Prompt {0} is not supported. Please choose options {1}, {2}, {3}!", prompt, PostPrompts["Celebration"], PostPrompts["Life Update"], PostPrompts["Other"]);
+  constructor() {
+    super("Please choose a Prompt option below!");
   }
 }
 

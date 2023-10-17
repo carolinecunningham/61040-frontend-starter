@@ -27,6 +27,11 @@ export default class FilteringConcept {
     return { msg: "Filter successfully created!", filter: await this.filters.readOne({ _id }) };
   }
 
+  async getFilter(filterName: string) {
+    const filter = await this.filters.readOne({ filterName });
+    return filter;
+  }
+
   async assignToFilter(filterName: string, item: ObjectId) {
     // we have assignToFilter 1) check if filter already exists and 2) if not create it
     // this simplifies logic of having to check if filter already exists
@@ -38,6 +43,27 @@ export default class FilteringConcept {
     } else {
       // assign to existing filter
       const filter_items = filter.filterItems.concat(item);
+      await this.filters.updateOne({ filterName }, { filterItems: filter_items });
+    }
+  }
+
+  async removeFromFilter(filterName: string, item: ObjectId) {
+    // we have assignToFilter 1) check if filter already exists and 2) if not create it
+    // this simplifies logic of having to check if filter already exists
+    const filter = await this.filters.readOne({ filterName });
+
+    if (!filter) {
+      throw new FilterNotFoundError(filterName);
+    } else {
+      // remove from filter
+      const filter_idx = filter.filterItems.indexOf(item);
+      const filter_items = filter.filterItems;
+      console.log(filter_items);
+      console.log("DELETE");
+      if (filter_idx !== -1) {
+        filter_items.splice(filter_idx);
+      }
+      console.log(filter_items);
       await this.filters.updateOne({ filterName }, { filterItems: filter_items });
     }
   }
