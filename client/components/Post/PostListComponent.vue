@@ -55,7 +55,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  {{ posts }}
+  <!-- {{ posts }} -->
   <!-- {{ userPosts }} -->
 
   <section v-if="isLoggedIn">
