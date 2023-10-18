@@ -19,10 +19,10 @@ const deletePost = async () => {
 </script>
 
 <template>
-  <p class="author">{{ props.post.author }}</p>
   <p v-if="props.post.prompt == 0 && props.post.author !== currentUsername">Congratulate {{ props.post.author }}!</p>
   <p v-if="props.post.prompt == 1 && props.post.author !== currentUsername">Check out what {{ props.post.author }} is doing!</p>
   <p v-if="props.post.prompt == 2 && props.post.author !== currentUsername">Say something nice to {{ props.post.author }}!</p>
+  <p class="author">{{ props.post.author }}</p>
   <p>{{ props.post.content }}</p>
   <div class="base">
     <menu v-if="props.post.author == currentUsername">

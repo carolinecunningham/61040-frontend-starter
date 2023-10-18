@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 
@@ -10,13 +10,13 @@ console.log(props.Friends);
 </script>
 
 <template>
-  <!-- <p>{{ props.Friend }}</p> -->
-  <div class="base">
+   <p>{{ props.Friend }}</p> -->
+<!-- <div class="base">
     <li><button class="btn-small pure-button" @click="emit('removeFriend', props.friend._id)">Remove Friend</button></li>
   </div>
-</template>
+</template> -->
 
-<style scoped>
+<!-- <style scoped>
 p {
   margin: 0em;
 }
@@ -52,3 +52,4 @@ menu {
   margin-left: auto;
 }
 </style>
+-->
