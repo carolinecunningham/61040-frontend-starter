@@ -150,6 +150,9 @@ class Routes {
 
   @Router.delete("/friends/:friend")
   async removeFriend(session: WebSessionDoc, friend: string) {
+    // TODO: why does this not work -- generates user not found error
+    console.log("FRIEND");
+    console.log(friend);
     const user = WebSession.getUser(session);
     const friendId = (await User.getUserByUsername(friend))._id;
     return await Friend.removeFriend(user, friendId);
@@ -158,7 +161,9 @@ class Routes {
   @Router.get("/friends/requests")
   async getRequests(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
-    return await Responses.friendRequests(await Friend.getRequests(user));
+    const results = await Friend.getRequests(user);
+    const pendingResults = results.filter((req) => req.status !== "accepted");
+    return await Responses.friendRequests(pendingResults);
   }
 
   @Router.post("/friends/requests/:to")
@@ -301,7 +306,22 @@ class Routes {
     // combine recommended users, prioritize by both school and hometown
 
     const recItems = await Filtering.getRecommendedItems(userID, usersShareSchool, usersShareHometown, maxQuantity);
-    return Responses.recommendedUsers(recItems);
+    const recUsernames = await Responses.recommendedUsers(recItems);
+
+    const recResults: Record<string, string> = {};
+
+    for (let i = 0; i < recUsernames.length; i++) {
+      const recReason = Filtering.getRecReason(userID, usersShareSchool, usersShareHometown);
+      if (recReason == 2) {
+        recResults[recUsernames[i]] = "Also goes to " + user.school + " and is from " + user.hometown;
+      }
+      if (recReason == 1) {
+        recResults[recUsernames[i]] = "Also goes to " + user.school;
+      } else {
+        recResults[recUsernames[i]] = "Also is from " + user.hometown;
+      }
+    }
+    return recResults;
   }
 
   @Router.put("/filter/recommendedUsers/")

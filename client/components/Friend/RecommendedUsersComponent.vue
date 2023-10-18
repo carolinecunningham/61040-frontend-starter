@@ -5,14 +5,12 @@ import { fetchy } from "../../utils/fetchy";
 const loaded = ref(false);
 let recommendedFriends = ref<Array<Record<string, string>>>([]);
 
-async function getRecommendedFriends(maxQuantity?: number) {
-  let query: Record<string, number> = maxQuantity !== undefined ? { maxQuantity } : {};
-  console.log("QUERY");
-  console.log(query);
+async function getRecommendedFriends(maxQuantity?: string) {
+  let query: Record<string, string> = maxQuantity !== undefined ? { maxQuantity } : {};
   let friendResults;
   try {
     // TODO: figure fetchy out, appends
-    friendResults = await fetchy("/api/filter/recommendedUsers/", "GET", query);
+    friendResults = await fetchy("/api/filter/recommendedUsers/", "GET", { query });
   } catch (_) {
     return;
   }
@@ -31,7 +29,7 @@ async function sendRequest(user: string) {
 // TODO: unique post prompting feature --> show commonalitities
 
 onBeforeMount(async () => {
-  await getRecommendedFriends(5);
+  await getRecommendedFriends();
   loaded.value = true;
 });
 </script>
@@ -39,11 +37,10 @@ onBeforeMount(async () => {
 <!-- todo: why has a user been recommended to you? -->
 
 <template>
-  {{ recommendedFriends }}
   <section class="friends" v-if="loaded && recommendedFriends.length !== 0">
-    <menu v-for="f in recommendedFriends" :key="f">
+    <menu v-for="(f, index) in recommendedFriends" :key="index">
+      <p :f="recommendedFriends" @refreshFriends="updateFriends">{{ index }}</p>
       <p :f="recommendedFriends" @refreshFriends="updateFriends">{{ f }}</p>
-      <li><button class="button-error btn-small pure-button" @click="sendRequest(f)">Request Friend</button></li>
     </menu>
   </section>
   <p v-else-if="loaded">No recommedended friends found.</p>

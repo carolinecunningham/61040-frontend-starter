@@ -141,6 +141,16 @@ export default class FilteringConcept {
       }
     }
   }
+
+  public getRecReason(user_id: ObjectId, usersShareSchool: ObjectId[], usersShareHometown: ObjectId[]) {
+    if (usersShareSchool.indexOf(user_id) !== -1 && usersShareHometown.indexOf(user_id)) {
+      return 2; // school and hometown
+    } else if (usersShareSchool.indexOf(user_id) !== -1) {
+      return 1; // school
+    } else {
+      return 0; // hometown
+    }
+  }
 }
 
 export class FilterNotFoundError extends NotFoundError {
