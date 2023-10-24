@@ -23,7 +23,7 @@ async function getPosts(author?: string) {
   try {
     postResults = await fetchy("/api/posts", "GET", { query });
     console.log();
-    postResults = postResults.filter((post) => post.author !== userName);
+    postResults = postResults.filter((post: { author: string }) => post.author !== userName);
   } catch (_) {
     return;
   }
