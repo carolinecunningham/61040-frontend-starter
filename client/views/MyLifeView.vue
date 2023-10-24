@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import RecommendedUsersComponent from "../components/Friend/RecommendedUsersComponent.vue";
-const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
-</script>
+import ListofLabelsComponent from "../components/List/ListofLabelsComponent.vue";
 
+const { isLoggedIn, currentUsername } = storeToRefs(useUserStore());
+</script>
 <template>
   <main>
     <section>
@@ -12,8 +12,7 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
       <h1 v-else>Please login!</h1>
     </section>
     <h1>Your Friends</h1>
-    <RecommendedUsersComponent />
-    <!-- Insert Recommended Users Here -->
+    <ListofLabelsComponent />
   </main>
 </template>
 

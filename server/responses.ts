@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { User } from "./app";
+import { NoMoreSuggestionsError, RecommendationsNotFoundError } from "./concepts/filtering";
 import { AlreadyFriendsError, FriendNotFoundError, FriendRequestAlreadyExistsError, FriendRequestDoc, FriendRequestNotFoundError } from "./concepts/friend";
 import { PostAuthorNotMatchError, PostDoc } from "./concepts/post";
 import { Router } from "./framework/router";
@@ -52,6 +53,16 @@ export default class Responses {
 Router.registerError(PostAuthorNotMatchError, async (e) => {
   const username = (await User.getUserById(e.author)).username;
   return e.formatWith(username, e._id);
+});
+
+Router.registerError(NoMoreSuggestionsError, async (e) => {
+  const username = (await User.getUserById(e._id)).username;
+  return e.formatWith(username);
+});
+
+Router.registerError(RecommendationsNotFoundError, async (e) => {
+  const username = (await User.getUserById(e._id)).username;
+  return e.formatWith(username);
 });
 
 Router.registerError(FriendRequestAlreadyExistsError, async (e) => {

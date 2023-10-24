@@ -1,11 +1,20 @@
 <script setup lang="ts">
+import { useUserStore } from "@/stores/user";
+import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const loaded = ref(false);
+const request_username = ref("");
+
+const { currentUsername } = storeToRefs(useUserStore());
+
 let friends = ref<Array<Record<string, string>>>([]);
 let requests = ref<Array<Record<string, string>>>([]);
-const requestShown = ref(false);
+let sentRequests = ref<Array<Record<string, string>>>([]);
+let incomingRequests = ref<Array<Record<string, string>>>([]);
+
+const emit = defineEmits(["recommendedUsersUpdate"]);
 
 async function getFriends() {
   let friendResults;
@@ -17,35 +26,50 @@ async function getFriends() {
   friends.value = friendResults;
 }
 
-async function sendRequest(user: string) {
+async function getRequests() {
+  let queriedRequests;
   try {
-    const query = "/api/friends/requests/" + user;
-    await fetchy(query, "POST");
+    const query = "/api/friends/requests";
+    queriedRequests = await fetchy(query, "GET");
+    console.log(queriedRequests);
   } catch (_) {
     return;
   }
+  requests.value = queriedRequests;
+  sentRequests.value = queriedRequests.filter((key: any) => key.from === currentUsername.value);
+  incomingRequests.value = queriedRequests.filter((key: any) => key.to === currentUsername.value);
+  emit("recommendedUsersUpdate");
 }
 
-async function getRequests() {
-  let friendResults;
+async function sendRequest(username: string) {
   try {
-    friendResults = await fetchy("/api/friends/requests", "GET");
+    await fetchy(`/api/friends/requests/${username}`, "POST");
   } catch (_) {
     return;
   }
-  console.log("VALUE");
-  console.log(friendResults);
-  requests.value = friendResults;
+  await getRequests();
 }
 
 const removeFriend = async (friend: string) => {
-  const query = { friend };
+  // parameter not query
+  // query --> searching for something, GET, filtering
+  // parameter: going to specific page (signified by colon)
+  // body: passed in as JSON to request, avoid overloaded URL
   try {
-    await fetchy("/api/friends/", "DELETE", { query });
+    await fetchy(`/api/friends/${friend}`, "DELETE");
   } catch {
     return;
   }
   await getFriends();
+};
+
+const rejectRequest = async (friendName: string) => {
+  try {
+    await fetchy(`/api/friends/reject/${friendName}`, "PUT");
+  } catch {
+    return;
+  }
+  await getRequests();
 };
 
 const acceptRequest = async (friendName: string) => {
@@ -54,19 +78,18 @@ const acceptRequest = async (friendName: string) => {
   } catch {
     return;
   }
-  await getFriends();
   await getRequests();
+  await getFriends();
 };
 
-// const getUserID = async (username: string) => {
-//   try {
-//     return await fetchy(`api/users/${username}`, "GET");
-//   } catch {
-//     return;
-//   }
-// };
-
-// friendIds.value = await Promise.all(friends.value.map((friend) => getUserID(friend)));
+const removeSentRequest = async (friendName: string) => {
+  try {
+    await fetchy(`/api/friends/requests/${friendName}`, "DELETE");
+  } catch {
+    return;
+  }
+  await getRequests();
+};
 
 onBeforeMount(async () => {
   await getFriends();
@@ -77,40 +100,47 @@ onBeforeMount(async () => {
 
 <template>
   <h2>Friends</h2>
-  <section class="friends" v-if="loaded && friends.length !== 0">
-    <menu v-for="(f, index) in friends" :key="f.username">
-      <p :f="friends" @refreshFriends="getFriends">{{ index }}</p>
+  {{ friends }}
+  {{ Object.keys(friends).length === 0 }}
+  <section class="friends" v-if="loaded && Object.keys(friends).length !== 0">
+    <menu v-for="f in Object.keys(friends)" :key="f">
+      <p :f="friends" @refreshFriends="getFriends">{{ f }}</p>
       <li><button class="button-error btn-small pure-button" @click="removeFriend(f)">Remove Friend</button></li>
-      <!-- TODO: why does remove have User Not Found error -->
     </menu>
   </section>
-  <p v-else-if="loaded">No friends found</p>
+  <p v-else-if="loaded">You currently have no friends</p>
   <p v-else>Loading...</p>
 
   <h2>Incoming Requests</h2>
-  <section v-if="loaded && requests.length !== 0">
-    <menu v-for="(r, index) in requests" :key="r">
+  {{ incomingRequests }}
+  <section v-if="loaded && incomingRequests[0] !== undefined">
+    <menu v-for="r in Object.values(incomingRequests)" :key="r.from">
       <p r="requests" @refreshFriends="getRequests">{{ r.from }}</p>
       <li><button class="button-error btn-small pure-button" @click="acceptRequest(r.from)">Accept Request</button></li>
+      <li><button class="button-error btn-small pure-button" @click="rejectRequest(r.from)">Reject Request</button></li>
+    </menu>
+  </section>
+  <p v-else-if="loaded">No pending friend requests found.</p>
+  <p v-else>Loading...</p>
+
+  <h2>Sent Requests</h2>
+  <section v-if="loaded && sentRequests[0] !== undefined">
+    <menu v-for="r in Object.values(sentRequests)" :key="r.to">
+      <p r="requests" @refreshFriends="getRequests">{{ r.to }}</p>
+      <li><button class="button-error btn-small pure-button" @click="removeSentRequest(r.to)">Remove Request</button></li>
     </menu>
   </section>
   <p v-else-if="loaded">No pending friend requests found.</p>
   <p v-else>Loading...</p>
 
   <h2>Request Friend</h2>
-  <form @submit.prevent="sendRequest(username)">
-    <textarea id="username" v-model="username" instruction="Enter Username" required> </textarea>
-    <button class="button-error btn-small pure-button">Send Friend Request</button>
-  </form>
-
-  <!-- <section v-if="loaded && requests.length !== 0">
-    <menu v-for="(r, index) in requests" :key="r">
-      <p :r="requests" @refreshFriends="getFriends">{{ f }}</p>
-      <li><button class="button-error btn-small pure-button" @click="removeFriend(friendIds[index])">Remove Friend</button></li>
-    </menu>
-  </section>
-  <p v-else-if="loaded">Sent friend requests found.</p>
-  <p v-else>Loading...</p> -->
+  {{ sentRequests }}
+  <div class="center">
+    <form @submit.prevent="sendRequest(request_username)">
+      <textarea id="username" v-model="request_username" instruction="Enter Username" required> </textarea>
+      <button class="button-error btn-small pure-button">Send Friend Request</button>
+    </form>
+  </div>
 </template>
 
 <style scoped>
@@ -165,6 +195,11 @@ form {
   display: flex;
   padding: 0.25em;
   margin: auto;
+  align-items: center;
+}
+.center {
+  text-align: center;
+  display: flex;
   align-items: center;
 }
 </style>

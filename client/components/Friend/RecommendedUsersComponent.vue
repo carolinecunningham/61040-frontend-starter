@@ -1,9 +1,15 @@
 <script setup lang="ts">
+import FriendListComponent from "@/components/Friend/FriendListComponent.vue";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const loaded = ref(false);
+
 let recommendedFriends = ref<Array<Record<string, string>>>([]);
+let friendsDisplay = ref<Array<Record<string, string>>>([]);
+
+let startingIdx = 0;
+const numToShow = 2;
 
 async function getRecommendedFriends(maxQuantity?: string) {
   let query: Record<string, string> = maxQuantity !== undefined ? { maxQuantity } : {};
@@ -17,34 +23,56 @@ async function getRecommendedFriends(maxQuantity?: string) {
   recommendedFriends.value = friendResults;
 }
 
-async function sendRequest(user: string) {
+async function updateShown(startIdx: number, numShowInput: number) {
+  let startingNum = new Number(startIdx);
+  let numShow = new Number(numShowInput);
+
+  const startingIndex = startingNum.toString();
+  const numDisplay = numShow.toString();
+
+  let query: Record<string, string> = { startingIndex, numDisplay };
+
+  let friendResults;
   try {
-    const query = "api/friends/requests/" + user;
-    await fetchy(query, "POST");
+    friendResults = await fetchy("/api/filter/recommendedUsers/", "PUT", { query });
   } catch (_) {
+    console.log("ERRR");
     return;
   }
+  startingIdx += numShowInput;
+  friendsDisplay.value = friendResults;
 }
 
-// TODO: unique post prompting feature --> show commonalitities
+async function updateFriendsRecs() {
+  console.log("UPDATE");
+  await getRecommendedFriends();
+  console.log(recommendedFriends);
+  // await updateShown(startingIdx, numToShow);
+}
 
 onBeforeMount(async () => {
   await getRecommendedFriends();
+  await updateShown(startingIdx, numToShow);
   loaded.value = true;
 });
 </script>
 
-<!-- todo: why has a user been recommended to you? -->
-
 <template>
-  <section class="friends" v-if="loaded && recommendedFriends.length !== 0">
-    <menu v-for="(f, index) in recommendedFriends" :key="index">
-      <p :f="recommendedFriends" @refreshFriends="updateFriends">{{ index }}</p>
-      <p :f="recommendedFriends" @refreshFriends="updateFriends">{{ f }}</p>
+  <FriendListComponent @recommendedUsersUpdate="updateFriendsRecs"></FriendListComponent>
+  <h2>Recommended Friends</h2>
+  {{ recommendedFriends }}
+  {{ friendsDisplay }}
+  <section class="friends" v-if="loaded && friendsDisplay.length !== 0">
+    <menu v-for="(f, index) in friendsDisplay" :key="index">
+      <p :f="friendsDisplay">{{ index }}</p>
+      <p :f="friendsDisplay">{{ f }}</p>
     </menu>
   </section>
-  <p v-else-if="loaded">No recommedended friends found.</p>
+  <p v-else-if="loaded">No recommended friends found.</p>
   <p v-else>Loading...</p>
+  <div class="center">
+    <li><button class="button-error btn-small pure-button" @click="updateShown(startingIdx, numToShow)">See More Suggestions</button></li>
+  </div>
 </template>
 
 <style scoped>
@@ -79,6 +107,14 @@ article {
   justify-content: space-between;
   margin: 0 auto;
   max-width: 60em;
+}
+
+h2 {
+  text-align: center;
+}
+
+.center {
+  text-align: center;
 }
 
 menu {

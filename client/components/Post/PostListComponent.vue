@@ -62,11 +62,6 @@ onBeforeMount(async () => {
     <h2>Create a post:</h2>
     <CreatePostForm @refreshPosts="getUsersPosts" />
   </section>
-  <div class="row">
-    <h2 v-if="!searchAuthor">Posts:</h2>
-    <h2 v-else>Posts by {{ searchAuthor }}:</h2>
-    <SearchPostForm @getPostsByAuthor="getPosts" />
-  </div>
 
   <h2>Your Posts</h2>
   <section class="posts" v-if="loaded && userPosts.length !== 0">
@@ -75,10 +70,16 @@ onBeforeMount(async () => {
       <EditPostForm v-else :post="userPost" @refreshPosts="getUsersPosts" @editPost="updateEditing" />
     </article>
   </section>
-  <p v-else-if="loaded">No posts found</p>
+  <p v-else-if="loaded" class="center">No posts found. Create a post and you can see it here!</p>
   <p v-else>Loading...</p>
 
   <h2>Feed</h2>
+  <div class="row">
+    <h2 v-if="!searchAuthor">Posts:</h2>
+    <h2 v-else>Posts by {{ searchAuthor }}:</h2>
+    <SearchPostForm @getPostsByAuthor="getPosts" />
+  </div>
+
   <section class="posts" v-if="loaded && posts.length !== 0">
     <article v-for="post in posts" :key="post._id">
       <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
@@ -109,6 +110,10 @@ article {
   flex-direction: column;
   gap: 0.5em;
   padding: 1em;
+}
+
+.center {
+  text-align: center;
 }
 
 .posts {

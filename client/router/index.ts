@@ -5,8 +5,8 @@ import { useUserStore } from "@/stores/user";
 import FriendView from "../views/FriendsView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
+import MyLifeView from "../views/MyLifeView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
-import ProfileView from "../views/ProfileView.vue";
 import SettingView from "../views/SettingView.vue";
 
 const router = createRouter({
@@ -24,9 +24,9 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/profile",
-      name: "Profile",
-      component: ProfileView,
+      path: "/lists",
+      name: "MyLifeLists",
+      component: MyLifeView,
       meta: { requiresAuth: true },
     },
     {

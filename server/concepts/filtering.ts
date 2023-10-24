@@ -11,7 +11,6 @@ export interface FilterDoc extends BaseDoc {
 export interface RecItemsDoc extends BaseDoc {
   owner: ObjectId;
   recommendedItems: ObjectId[];
-  startingIndex: number;
 }
 
 // referenced https://howtodoinjava.com/typescript/sets/
@@ -104,7 +103,7 @@ export default class FilteringConcept {
     return mutualItems;
   }
 
-  async getRecommendedItems(owner: ObjectId, filter1: ObjectId[], filter2: ObjectId[], maxQuantity: number) {
+  async getRecommendedItems(owner: ObjectId, filter1: ObjectId[], filter2: ObjectId[]) {
     const inBothFilters = this.getFiltersIntersection(filter1, filter2);
     const onlyInFilter1 = this.removeItemsFromFilter(filter1, inBothFilters);
     const onlyInFilter2 = this.removeItemsFromFilter(filter2, inBothFilters);
@@ -117,33 +116,47 @@ export default class FilteringConcept {
     // console.log(onlyInFilter1);
     // console.log(onlyInFilter2);
     // referenced https://stackoverflow.com/questions/60041413/typescript-number-addition-0-1-returns-01
-    const nextIdx = (maxQuantity + 1) / 1;
 
-    await this.recommended_items.createOne({ owner, recommendedItems, startingIndex: nextIdx });
-    return recommendedItems.slice(0, maxQuantity);
+    const recItems = this.recommended_items.readOne({ owner });
+    if (!recItems) {
+      await this.recommended_items.createOne({ owner, recommendedItems });
+    } else {
+      await this.recommended_items.updateOne({ owner }, { recommendedItems });
+    }
+    return recommendedItems;
   }
 
-  async getMoreRecommendations(owner: ObjectId, maxQuantity: number) {
-    const recItemsFilter = await this.recommended_items.readOne({ owner });
-    if (!recItemsFilter) {
+  async updateShown(owner: ObjectId, startingIndex: number, numDisplay: number) {
+    const recItems = await this.recommended_items.readOne({ owner });
+    if (!recItems) {
       throw new RecommendationsNotFoundError(owner);
+    }
+    if (startingIndex > recItems.recommendedItems.length) {
+      throw new NoMoreSuggestionsError(owner);
     } else {
-      const recommended_items = recItemsFilter.recommendedItems;
-      if (recItemsFilter.startingIndex > recommended_items.length) {
-        throw new NoMoreSuggestionsError(owner);
-      } else {
-        const maxQuant = maxQuantity / 1;
-        const end_idx = (recItemsFilter.startingIndex + maxQuant) / 1;
-        const rec_items = recommended_items.slice(recItemsFilter.startingIndex, end_idx);
-        const startingIndex = (recItemsFilter.startingIndex += maxQuant);
-        await this.recommended_items.updateOne({ owner }, { startingIndex });
-        return rec_items;
-      }
+      const endIdx = new Number(startingIndex).valueOf() + new Number(numDisplay).valueOf();
+      const end = endIdx > recItems.recommendedItems.length ? recItems.recommendedItems.length : endIdx;
+      return recItems.recommendedItems.slice(startingIndex, end);
     }
   }
 
+  // async getMoreRecommendations(owner: ObjectId, maxQuantity: number) {
+  //   const recItemsFilter = await this.recommended_items.readOne({ owner });
+  //   if (!recItemsFilter) {
+  //     throw new RecommendationsNotFoundError(owner);
+  //   } else {
+  //     const recommended_items = recItemsFilter.recommendedItems;
+  //       const maxQuant = maxQuantity / 1;
+  //       const end_idx = (recItemsFilter.startingIndex + maxQuant) / 1;
+  //       const rec_items = recommended_items.slice(recItemsFilter.startingIndex, end_idx);
+  //       const startingIndex = (recItemsFilter.startingIndex += maxQuant);
+  //       await this.recommended_items.updateOne({ owner }, { startingIndex });
+  //       return rec_items;
+  //   }
+  // }
+
   public getRecReason(user_id: ObjectId, usersShareSchool: ObjectId[], usersShareHometown: ObjectId[]) {
-    if (usersShareSchool.indexOf(user_id) !== -1 && usersShareHometown.indexOf(user_id)) {
+    if (usersShareSchool.indexOf(user_id) !== -1 && usersShareHometown.indexOf(user_id) !== -1) {
       return 2; // school and hometown
     } else if (usersShareSchool.indexOf(user_id) !== -1) {
       return 1; // school
@@ -153,20 +166,20 @@ export default class FilteringConcept {
   }
 }
 
-export class FilterNotFoundError extends NotFoundError {
-  constructor(public readonly filterName: string) {
-    super("Filter for {0} does not exist!", filterName);
-  }
-}
-
 export class RecommendationsNotFoundError extends NotFoundError {
   constructor(public readonly _id: ObjectId) {
     super("Recommended items for {0} does not exist!", _id);
   }
 }
 
+export class FilterNotFoundError extends NotFoundError {
+  constructor(public readonly filterName: string) {
+    super("Filter {0} does not exist!", filterName);
+  }
+}
+
 export class NoMoreSuggestionsError extends NotAllowedError {
   constructor(public readonly _id: ObjectId) {
-    super("Cannot get any more recommended items for {0}!", _id);
+    super("No more recommended users {0}!", _id);
   }
 }

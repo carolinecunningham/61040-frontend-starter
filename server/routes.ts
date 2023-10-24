@@ -210,19 +210,22 @@ class Routes {
   }
 
   @Router.put("/lists/assign/:_id")
-  async assignToLabel(session: WebSessionDoc, _id: ObjectId, item: ObjectId) {
+  async assignToLabel(session: WebSessionDoc, _id: ObjectId, friendName: string) {
     const user = WebSession.getUser(session);
-    const friendUserID = (await User.getUserById(item))._id;
+    const friendUser = await User.getUserByUsername(friendName);
+    const friendUserID = friendUser._id;
     await Label.isAuthor(_id, user);
     await Friend.areUsersFriends(friendUserID, user);
-    return await Label.assignToLabel(_id, item);
+    return await Label.assignToLabel(_id, friendUserID);
   }
 
   @Router.put("/lists/remove/:_id")
-  async removeFromLabel(session: WebSessionDoc, _id: ObjectId, item: ObjectId) {
+  async removeFromLabel(session: WebSessionDoc, _id: ObjectId, friendName: string) {
     const user = WebSession.getUser(session);
+    const friendUser = await User.getUserByUsername(friendName);
+    const friendUserID = friendUser._id;
     await Label.isAuthor(_id, user);
-    return await Label.removeFromLabel(_id, item);
+    return await Label.removeFromLabel(_id, friendUserID);
   }
 
   @Router.delete("/lists/:_id")
@@ -237,6 +240,14 @@ class Routes {
     const user = WebSession.getUser(session);
     await Label.isAuthor(_id, user);
     return await Label.getLabelItems(_id);
+  }
+
+  @Router.get("/lists/usernames/:_id")
+  async getLabelUsernames(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    await Label.isAuthor(_id, user);
+    const items = await Label.getLabelItems(_id);
+    return await Promise.all(items.map(async (obj_id) => (await User.getUserById(obj_id)).username));
   }
 
   // FEED Routes
@@ -288,7 +299,7 @@ class Routes {
   // FILTER ROUTES
 
   @Router.get("/filter/recommendedUsers/")
-  async getRecommendedUsers(session: WebSessionDoc, maxQuantity: number) {
+  async getAllRecommendedUsers(session: WebSessionDoc) {
     const userID = WebSession.getUser(session);
     const user = await User.getUserById(userID);
 
@@ -305,7 +316,7 @@ class Routes {
 
     // combine recommended users, prioritize by both school and hometown
 
-    const recItems = await Filtering.getRecommendedItems(userID, usersShareSchool, usersShareHometown, maxQuantity);
+    const recItems = await Filtering.getRecommendedItems(userID, usersShareSchool, usersShareHometown);
     const recUsernames = await Responses.recommendedUsers(recItems);
 
     const recResults: Record<string, string> = {};
@@ -314,8 +325,7 @@ class Routes {
       const recReason = Filtering.getRecReason(userID, usersShareSchool, usersShareHometown);
       if (recReason == 2) {
         recResults[recUsernames[i]] = "Also goes to " + user.school + " and is from " + user.hometown;
-      }
-      if (recReason == 1) {
+      } else if (recReason == 1) {
         recResults[recUsernames[i]] = "Also goes to " + user.school;
       } else {
         recResults[recUsernames[i]] = "Also is from " + user.hometown;
@@ -325,11 +335,50 @@ class Routes {
   }
 
   @Router.put("/filter/recommendedUsers/")
-  async seeMoreSuggestions(session: WebSessionDoc, maxQuantity: number) {
+  async getRecommendationRange(session: WebSessionDoc, startingIndex: number, numDisplay: number) {
     const userID = WebSession.getUser(session);
+    const user = await User.getUserById(userID);
 
-    return await Filtering.getMoreRecommendations(userID, maxQuantity);
+    const recItems = await Filtering.updateShown(userID, startingIndex, numDisplay);
+    const recUsernames = await Responses.recommendedUsers(recItems);
+    const recUsers = await Promise.all(recItems.map(async (obj_id) => await User.getUserById(obj_id)));
+
+    const recResults: Record<string, string> = {};
+
+    for (let i = 0; i < recUsers.length; i++) {
+      if (recUsers[i].school === user.school && recUsers[i].hometown === user.hometown) {
+        recResults[recUsernames[i]] = "Also goes to " + user.school + " and is from " + user.hometown;
+      } else if (recUsers[i].school === user.school) {
+        recResults[recUsernames[i]] = "Also goes to " + user.school;
+      } else {
+        recResults[recUsernames[i]] = "Also is from " + user.hometown;
+      }
+    }
+    return recResults;
   }
+
+  // @Router.put("/filter/recommendedUsers/")
+  // async seeMoreSuggestions(session: WebSessionDoc) {
+  //   const userID = WebSession.getUser(session);
+  //   const user = await User.getUserById(userID);
+
+  //   const recItems = await Filtering.getMoreRecommendations(userID);
+  //   const recUsers = await Promise.all(recItems.map(async (obj_id) => await User.getUserById(obj_id)));
+  //   const recUsernames = await Responses.recommendedUsers(recItems);
+
+  //   const recResults: Record<string, string> = {};
+
+  //   for (let i = 0; i < recItems.length; i++) {
+  //     if (recUsers[i].school === user.school && recUsers[i].hometown === user.hometown) {
+  //       recResults[recUsernames[i]] = "Also goes to " + user.school + " and is from " + user.hometown;
+  //     } else if (recUsers[i].school === user.school) {
+  //       recResults[recUsernames[i]] = "Also goes to " + user.school;
+  //     } else {
+  //       recResults[recUsernames[i]] = "Also is from " + user.hometown;
+  //     }
+  //   }
+  //   return recResults;
+  // }
 }
 
 export default getExpressRouter(new Routes());
