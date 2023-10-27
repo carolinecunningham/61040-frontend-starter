@@ -2,14 +2,30 @@
 import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
+import { storeToRefs } from "pinia";
+
+import { useLabelStore } from "../../stores/label";
+const { labels } = storeToRefs(useLabelStore());
+const { getLabels } = useLabelStore();
+
 const content = ref("");
 const prompt = ref();
+const audienceLabel = ref();
+
 const emit = defineEmits(["refreshPosts"]);
 
-const createPost = async (content: string, prompt: number) => {
+const createPost = async (content: string, prompt: number, audienceLabel?: string) => {
+  let body;
+  console.log("AUDIENCE");
+  console.log(audienceLabel);
+  if (audienceLabel) {
+    body = { content, prompt, audienceLabel };
+  } else {
+    body = { content, prompt };
+  }
   try {
-    await fetchy("api/posts", "POST", {
-      body: { content, prompt },
+    await fetchy("/api/posts", "POST", {
+      body: body,
     });
   } catch (_) {
     return;
@@ -25,7 +41,7 @@ const emptyForm = () => {
 </script>
 
 <template>
-  <form @submit.prevent="createPost(content, prompt)">
+  <form @submit.prevent="createPost(content, prompt, audienceLabel)">
     <label for="content">Post Contents:</label>
     <textarea id="content" v-model="content" placeholder="Create a post!" required> </textarea>
     <label for="prompt">Post Category:</label>
@@ -34,8 +50,11 @@ const emptyForm = () => {
       <option id="prompt" value="1">Life Update</option>
       <option id="prompt" value="2">Other</option>
     </select>
-    <label for="audience">Post Audience:</label>
-    <!-- use vif to get audience values -->
+    <label for="audienceLabel">Post Audience:</label>
+    <select v-model="audienceLabel">
+      <option id="audienceLabel"></option>
+      <option id="audienceLabel" v-for="label in labels" :key="label._id" :value="label._id">{{ label.name }}</option>
+    </select>
     <button type="submit" class="pure-button-primary pure-button">Create Post</button>
   </form>
 </template>
