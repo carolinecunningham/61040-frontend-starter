@@ -6,28 +6,28 @@ import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
-import SearchPostForm from "./SearchPostForm.vue";
 
+import { useLabelStore } from "../../stores/label";
+const { labels } = storeToRefs(useLabelStore());
+const { getLabels } = useLabelStore();
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
 let posts = ref<Array<Record<string, string>>>([]);
 let userPosts = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
-let searchAuthor = ref("");
+let filterLabel = ref("");
 
-async function getPosts(author?: string) {
-  const userName = currentUsername.value;
-  let query: Record<string, string> = author !== undefined ? { author } : {};
+async function getFeedPosts(label?: string) {
+  let query: Record<string, string> = label !== undefined ? { label } : {};
+  console.log(label);
   let postResults;
   try {
-    postResults = await fetchy("/api/posts", "GET", { query });
-    console.log();
-    postResults = postResults.filter((post: { author: string }) => post.author !== userName);
+    postResults = await fetchy("/api/feed", "GET", { query });
   } catch (_) {
     return;
   }
-  searchAuthor.value = author ? author : "";
+  console.log(postResults);
   posts.value = postResults;
 }
 
@@ -47,9 +47,14 @@ function updateEditing(id: string) {
   editing.value = id;
 }
 
+async function onChange() {
+  await getFeedPosts(filterLabel.value);
+}
+
 onBeforeMount(async () => {
-  await getPosts();
+  await getFeedPosts();
   await getUsersPosts();
+  await getLabels();
   loaded.value = true;
 });
 </script>
@@ -75,14 +80,20 @@ onBeforeMount(async () => {
 
   <h2>Feed</h2>
   <div class="row">
-    <h2 v-if="!searchAuthor">Posts:</h2>
-    <h2 v-else>Posts by {{ searchAuthor }}:</h2>
-    <SearchPostForm @getPostsByAuthor="getPosts" />
+    <!-- {{ labels }} -->
+    <!-- referenced https://stackoverflow.com/questions/43461752/how-to-render-array-to-select-option-vue-js -->
+    <!-- referenced https://stackoverflow.com/questions/50982408/vue-js-get-selected-option-on-change -->
+    <!-- referenced https://stackoverflow.com/questions/73399884/how-to-pass-the-key-as-select-option-value-from-v-for-when-changed-vuejs -->
+    <legend>Select MyLifeList to Filter On</legend>
+    <select v-model="filterLabel" @change="onChange()">
+      <option id="filterLabel"></option>
+      <option id="filterLabel" v-for="label in labels" :key="label._id" :value="label._id">{{ label.name }}</option>
+    </select>
   </div>
 
   <section class="posts" v-if="loaded && posts.length !== 0">
     <article v-for="post in posts" :key="post._id">
-      <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
+      <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getFeedPosts" @editPost="updateEditing" />
     </article>
   </section>
   <p v-else-if="loaded">No posts found</p>
@@ -118,6 +129,10 @@ article {
 
 .posts {
   padding: 1em;
+}
+
+legend {
+  margin-left: 650px;
 }
 
 .row {

@@ -200,6 +200,8 @@ class Routes {
   @Router.get("/lists/")
   async getLabels(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
+    console.log(user);
+    console.log(await Label.getLabelsByAuthor(user));
     return await Label.getLabelsByAuthor(user);
   }
 
@@ -276,8 +278,7 @@ class Routes {
       // referenced https://web.mit.edu/6.102/www/sp23/classes/13-functional/
       const postsWithAudience = posts.filter((post) => post.audience !== undefined);
       const postsWithoutAudience = posts.filter((post) => post.audience === undefined);
-      const postsIds = postsWithoutAudience.map((post) => post._id);
-      await Feed.bulkAddToFeed(user, postsIds);
+      await Feed.bulkAddToFeed(user, postsWithoutAudience);
 
       for (const post of postsWithAudience) {
         // console.log("REACHED");
@@ -287,14 +288,15 @@ class Routes {
           const labelItemsStr = labelItems.map((user_id) => user_id.toString());
           if (labelItemsStr.indexOf(user.toString()) !== -1) {
             // user in specified audience to see post
-            await Feed.addToFeed(user, post._id);
+            await Feed.addToFeed(user, post);
           }
         } else {
-          await Feed.addToFeed(user, post._id);
+          await Feed.addToFeed(user, post);
         }
       }
     }
-    return { msg: "Feed Updated", posts: await Feed.getFeedItems(user) };
+
+    return await Responses.posts(await Feed.getFeedItems(user));
   }
 
   // FILTER ROUTES

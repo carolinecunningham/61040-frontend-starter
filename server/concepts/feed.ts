@@ -1,10 +1,11 @@
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotFoundError } from "./errors";
+import { PostDoc } from "./post";
 
 export interface Feed extends BaseDoc {
   owner: ObjectId;
-  items: ObjectId[];
+  items: PostDoc[];
 }
 
 export default class FeedConcept {
@@ -15,7 +16,7 @@ export default class FeedConcept {
     return { msg: "Feed successfully created!", feed: feed };
   }
 
-  async addToFeed(owner: ObjectId, item: ObjectId) {
+  async addToFeed(owner: ObjectId, item: PostDoc) {
     const feed = await this.feed.readOne({ owner });
     if (!feed) {
       throw new NotFoundError("User does not have a feed.");
@@ -25,7 +26,7 @@ export default class FeedConcept {
     }
   }
 
-  async bulkAddToFeed(owner: ObjectId, newItems: ObjectId[]) {
+  async bulkAddToFeed(owner: ObjectId, newItems: PostDoc[]) {
     const feed = await this.feed.readOne({ owner });
     if (!feed) {
       throw new NotFoundError("User does not have a feed.");

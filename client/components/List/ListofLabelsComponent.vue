@@ -1,16 +1,22 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
+
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 
 import CreateLabelForm from "./CreateLabelForm.vue";
 import MyLabelComponent from "./MyLabelComponent.vue";
-const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const { isLoggedIn } = storeToRefs(useUserStore());
+
+let labels = ref<Array<Record<string, string>>>([]);
 
 const loaded = ref(false);
-let labels = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
+
+function updateEditing(id: string) {
+  editing.value = id;
+}
 
 async function getLabels() {
   let labelResults;
@@ -20,10 +26,6 @@ async function getLabels() {
     return;
   }
   labels.value = labelResults;
-}
-
-function updateEditing(id: string) {
-  editing.value = id;
 }
 
 onBeforeMount(async () => {
@@ -42,30 +44,13 @@ onBeforeMount(async () => {
   </section>
 
   <h2>Your Labels</h2>
-  <!-- {{ labels }} -->
   <section class="labels" v-if="loaded && labels.length !== 0">
     <article v-for="l in labels" :key="l._id">
-      <!-- {{ l }} -->
       <MyLabelComponent v-if="editing !== l._id" :label="l" @refreshLabels="getLabels" @editLabel="updateEditing" />
     </article>
   </section>
   <p v-else-if="loaded">No labels found. Create a labels and you can see it here!</p>
   <p v-else>Loading...</p>
-
-  <!-- <h2>Feed</h2>
-  <div class="row">
-    <h2 v-if="!searchAuthor">Posts:</h2>
-    <h2 v-else>Posts by {{ searchAuthor }}:</h2>
-    <SearchPostForm @getPostsByAuthor="getPosts" />
-  </div>
-
-  <section class="posts" v-if="loaded && posts.length !== 0">
-    <article v-for="post in posts" :key="post._id">
-      <MyLabelComponent v-if="editing !== post._id" :post="post" @refreshLabels="getLabels" @editPost="updateEditing" />
-    </article>
-  </section>
-  <p v-else-if="loaded">No posts found</p>
-  <p v-else>Loading...</p> -->
 </template>
 
 <style scoped>
