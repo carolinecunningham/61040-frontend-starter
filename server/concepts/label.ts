@@ -20,7 +20,7 @@ export default class LabelConcept {
   async assignToLabel(_id: ObjectId, item: ObjectId) {
     // referenced https://www.typescriptlang.org/docs/handbook/utility-types.html
     const label = await this.labels.readOne({ _id });
-    await this.itemisNotInLabel(_id, item, label);
+    await this.itemNotInLabel(_id, item);
     if (label !== null) {
       let label_items = label.items;
       if (label_items !== undefined) {
@@ -83,8 +83,11 @@ export default class LabelConcept {
     }
     if (label.items === undefined) {
       throw new NotAllowedError("Cannot delete from empty label");
-    } else if (label.items.indexOf(item) === -1) {
-      throw new NotAllowedError(`Cannot delete item that's not in label!`);
+    } else {
+      const items_string = label.items.map((item) => item.toString());
+      if (items_string.indexOf(item.toString()) === -1) {
+        throw new NotAllowedError(`Cannot delete item that's not in label!`);
+      }
     }
   }
 
@@ -98,13 +101,26 @@ export default class LabelConcept {
     }
   }
 
-  private async itemisNotInLabel(_id: ObjectId, item: ObjectId, label: LabelDoc | null) {
+  async itemNotInLabel(_id: ObjectId, item: ObjectId) {
+    const label = await this.labels.readOne({ _id });
+
     if (!label) {
       throw new LabelNotFound(_id);
     }
-    if (label.items !== undefined && label.items.indexOf(item) !== -1) {
-      throw new NotAllowedError(`Item has been already added to label!`);
+    if (label.items === undefined) {
+      throw new NotAllowedError("Label is empty");
+    } else {
+      const items_string = label.items.map((item) => item.toString());
+      if (items_string.indexOf(item.toString()) !== -1) {
+        throw new ItemNotInLabelError(item);
+      }
     }
+  }
+}
+
+export class ItemNotInLabelError extends NotAllowedError {
+  constructor(public readonly item: ObjectId) {
+    super("{0} is already in this list!", item);
   }
 }
 

@@ -46,8 +46,7 @@ onBeforeMount(async () => {
   <section class="labels" v-if="loaded && labels.length !== 0">
     <article v-for="l in labels" :key="l._id">
       <!-- {{ l }} -->
-      <MyLabelComponent v-if="editing !== l._id" :label="l" @refreshLabels="getLabels" @editPost="updateEditing" />
-      <!-- <EditPostForm v-else :post="userPost" @refreshLabels="getLabels" @editPost="updateEditing" /> -->
+      <MyLabelComponent v-if="editing !== l._id" :label="l" @refreshLabels="getLabels" @editLabel="updateEditing" />
     </article>
   </section>
   <p v-else-if="loaded">No labels found. Create a labels and you can see it here!</p>

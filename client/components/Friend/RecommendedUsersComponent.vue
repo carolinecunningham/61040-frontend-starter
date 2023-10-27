@@ -71,7 +71,7 @@ onBeforeMount(async () => {
   <p v-else-if="loaded">No recommended friends found.</p>
   <p v-else>Loading...</p>
   <div class="center">
-    <li><button class="button-error btn-small pure-button" @click="updateShown(startingIdx, numToShow)">See More Suggestions</button></li>
+    <button class="pure-button btn-small pure-button-primary" @click="updateShown(startingIdx, numToShow)">See More Suggestions</button>
   </div>
 </template>
 

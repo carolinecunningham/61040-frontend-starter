@@ -5,6 +5,7 @@ import { onBeforeMount, ref } from "vue";
 const props = defineProps(["label"]);
 const loaded = ref(false);
 const emit = defineEmits(["editLabel", "refreshLabels"]);
+const friend_username = ref("");
 
 const labelUsernames = ref<Array<Record<string, string>>>([]);
 
@@ -28,6 +29,28 @@ const deleteLabel = async () => {
   emit("refreshLabels");
 };
 
+const assignToLabel = async (name: string) => {
+  const query = { friendName: name };
+  try {
+    await fetchy(`/api/lists/assign/${props.label._id}`, "PUT", { query });
+  } catch (e) {
+    friend_username.value = "";
+    return;
+  }
+  await getLabelItems();
+  friend_username.value = "";
+};
+
+const removeFromLabel = async (name: string) => {
+  const query = { friendName: name };
+  try {
+    await fetchy(`/api/lists/remove/${props.label._id}`, "PUT", { query });
+  } catch (e) {
+    return;
+  }
+  await getLabelItems();
+};
+
 onBeforeMount(async () => {
   await getLabelItems();
   loaded.value = true;
@@ -36,17 +59,24 @@ onBeforeMount(async () => {
 
 <template>
   <p class="Name">{{ props.label.name }}</p>
+  <div class="delete">
+    <button class="pure-button btn-small pure-button-primary" @click="deleteLabel">Delete Label</button>
+  </div>
   <section class="friends" v-if="loaded && labelUsernames.length !== 0">
-    <p>Friends:</p>
-    <article v-for="(username, index) in labelUsernames" :key="index">
-      <p>{{ username }}</p>
-    </article>
+    <menu v-for="(username, index) in labelUsernames" :key="index">
+      <li>
+        {{ username }}
+        <button class="pure-button btn-small pure-button-primary" @click="removeFromLabel(username.toString())">Remove Friend</button>
+      </li>
+    </menu>
   </section>
-  <p v-else-if="loaded">No friends are in your label.</p>
+  <p class="friends" v-else-if="loaded">No friends are in your label.</p>
   <p v-else>Loading...</p>
   <div class="base">
-    <li><button class="btn-small pure-button" @click="emit('editLabel', props.label._id)">Edit</button></li>
-    <li><button class="button-error btn-small pure-button" @click="deleteLabel">Delete</button></li>
+    <form @submit.prevent="assignToLabel(friend_username)">
+      <textarea id="username" v-model="friend_username" instruction="Enter Friend's Username" required> </textarea>
+      <button class="pure-button btn-small pure-button-primary">Add Friend To Label</button>
+    </form>
   </div>
 </template>
 
@@ -69,8 +99,17 @@ menu {
   margin: 0;
 }
 
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  height: 0.5em;
+  padding: 0.5em;
+  border-radius: 2px;
+  resize: none;
+}
+
 .friends {
-  padding: 1em;
+  padding-bottom: 1em;
 }
 
 .timestamp {
@@ -84,6 +123,11 @@ menu {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.delete {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .base article:only-child {

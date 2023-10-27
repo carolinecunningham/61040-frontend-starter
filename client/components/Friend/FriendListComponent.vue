@@ -105,7 +105,7 @@ onBeforeMount(async () => {
   <section class="friends" v-if="loaded && Object.keys(friends).length !== 0">
     <menu v-for="f in Object.keys(friends)" :key="f">
       <p :f="friends" @refreshFriends="getFriends">{{ f }}</p>
-      <li><button class="button-error btn-small pure-button" @click="removeFriend(f)">Remove Friend</button></li>
+      <li><button class="pure-button btn-small pure-button-primary" @click="removeFriend(f)">Remove Friend</button></li>
     </menu>
   </section>
   <p v-else-if="loaded">You currently have no friends</p>
@@ -116,8 +116,8 @@ onBeforeMount(async () => {
   <section v-if="loaded && incomingRequests[0] !== undefined">
     <menu v-for="r in Object.values(incomingRequests)" :key="r.from">
       <p r="requests" @refreshFriends="getRequests">{{ r.from }}</p>
-      <li><button class="button-error btn-small pure-button" @click="acceptRequest(r.from)">Accept Request</button></li>
-      <li><button class="button-error btn-small pure-button" @click="rejectRequest(r.from)">Reject Request</button></li>
+      <li><button class="pure-button btn-small pure-button-primary" @click="acceptRequest(r.from)">Accept Request</button></li>
+      <li><button class="pure-button btn-small pure-button-primary" @click="rejectRequest(r.from)">Reject Request</button></li>
     </menu>
   </section>
   <p v-else-if="loaded">No pending friend requests found.</p>
@@ -127,7 +127,7 @@ onBeforeMount(async () => {
   <section v-if="loaded && sentRequests[0] !== undefined">
     <menu v-for="r in Object.values(sentRequests)" :key="r.to">
       <p r="requests" @refreshFriends="getRequests">{{ r.to }}</p>
-      <li><button class="button-error btn-small pure-button" @click="removeSentRequest(r.to)">Remove Request</button></li>
+      <li><button class="pure-button btn-small pure-button-primary" @click="removeSentRequest(r.to)">Remove Request</button></li>
     </menu>
   </section>
   <p v-else-if="loaded">No pending friend requests found.</p>
@@ -138,7 +138,7 @@ onBeforeMount(async () => {
   <div class="center">
     <form @submit.prevent="sendRequest(request_username)">
       <textarea id="username" v-model="request_username" instruction="Enter Username" required> </textarea>
-      <button class="button-error btn-small pure-button">Send Friend Request</button>
+      <button class="pure-button btn-small pure-button-primary">Send Friend Request</button>
     </form>
   </div>
 </template>

@@ -1,7 +1,8 @@
 import { ObjectId } from "mongodb";
 import { User } from "./app";
 import { NoMoreSuggestionsError, RecommendationsNotFoundError } from "./concepts/filtering";
-import { AlreadyFriendsError, FriendNotFoundError, FriendRequestAlreadyExistsError, FriendRequestDoc, FriendRequestNotFoundError } from "./concepts/friend";
+import { AlreadyFriendsError, FriendNotFoundError, FriendRequestAlreadyExistsError, FriendRequestDoc, FriendRequestNotFoundError, UsersNotFriendsError } from "./concepts/friend";
+import { ItemNotInLabelError } from "./concepts/label";
 import { PostAuthorNotMatchError, PostDoc } from "./concepts/post";
 import { Router } from "./framework/router";
 
@@ -50,6 +51,11 @@ export default class Responses {
   }
 }
 
+Router.registerError(ItemNotInLabelError, async (e) => {
+  const username = (await User.getUserById(e.item)).username;
+  return e.formatWith(username);
+});
+
 Router.registerError(PostAuthorNotMatchError, async (e) => {
   const username = (await User.getUserById(e.author)).username;
   return e.formatWith(username, e._id);
@@ -81,6 +87,11 @@ Router.registerError(FriendRequestNotFoundError, async (e) => {
 });
 
 Router.registerError(AlreadyFriendsError, async (e) => {
+  const [user1, user2] = await Promise.all([User.getUserById(e.user1), User.getUserById(e.user2)]);
+  return e.formatWith(user1.username, user2.username);
+});
+
+Router.registerError(UsersNotFriendsError, async (e) => {
   const [user1, user2] = await Promise.all([User.getUserById(e.user1), User.getUserById(e.user2)]);
   return e.formatWith(user1.username, user2.username);
 });

@@ -216,6 +216,7 @@ class Routes {
     const friendUserID = friendUser._id;
     await Label.isAuthor(_id, user);
     await Friend.areUsersFriends(friendUserID, user);
+    await Label.itemNotInLabel(_id, friendUserID);
     return await Label.assignToLabel(_id, friendUserID);
   }
 
