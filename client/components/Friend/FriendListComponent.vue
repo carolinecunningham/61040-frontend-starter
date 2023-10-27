@@ -100,8 +100,6 @@ onBeforeMount(async () => {
 
 <template>
   <h2>Friends</h2>
-  {{ friends }}
-  {{ Object.keys(friends).length === 0 }}
   <section class="friends" v-if="loaded && Object.keys(friends).length !== 0">
     <menu v-for="f in Object.keys(friends)" :key="f">
       <p :f="friends" @refreshFriends="getFriends">{{ f }}</p>
@@ -112,7 +110,6 @@ onBeforeMount(async () => {
   <p v-else>Loading...</p>
 
   <h2>Incoming Requests</h2>
-  {{ incomingRequests }}
   <section v-if="loaded && incomingRequests[0] !== undefined">
     <menu v-for="r in Object.values(incomingRequests)" :key="r.from">
       <p r="requests" @refreshFriends="getRequests">{{ r.from }}</p>
@@ -134,7 +131,6 @@ onBeforeMount(async () => {
   <p v-else>Loading...</p>
 
   <h2>Request Friend</h2>
-  {{ sentRequests }}
   <div class="center">
     <form @submit.prevent="sendRequest(request_username)">
       <textarea id="username" v-model="request_username" instruction="Enter Username" required> </textarea>

@@ -60,8 +60,6 @@ onBeforeMount(async () => {
 <template>
   <FriendListComponent @recommendedUsersUpdate="updateFriendsRecs"></FriendListComponent>
   <h2>Recommended Friends</h2>
-  {{ recommendedFriends }}
-  {{ friendsDisplay }}
   <section class="friends" v-if="loaded && friendsDisplay.length !== 0">
     <menu v-for="(f, index) in friendsDisplay" :key="index">
       <p :f="friendsDisplay">{{ index }}</p>
