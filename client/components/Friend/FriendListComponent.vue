@@ -106,7 +106,7 @@ onBeforeMount(async () => {
       <li><button class="pure-button btn-small pure-button-primary" @click="removeFriend(f)">Remove Friend</button></li>
     </menu>
   </section>
-  <p v-else-if="loaded">You currently have no friends</p>
+  <p v-else-if="loaded" class="center-text">You currently have no friends</p>
   <p v-else>Loading...</p>
 
   <h2>Incoming Requests</h2>
@@ -117,7 +117,7 @@ onBeforeMount(async () => {
       <li><button class="pure-button btn-small pure-button-primary" @click="rejectRequest(r.from)">Reject Request</button></li>
     </menu>
   </section>
-  <p v-else-if="loaded">No pending friend requests found.</p>
+  <p v-else-if="loaded" class="center-text">No pending friend requests found.</p>
   <p v-else>Loading...</p>
 
   <h2>Sent Requests</h2>
@@ -127,7 +127,7 @@ onBeforeMount(async () => {
       <li><button class="pure-button btn-small pure-button-primary" @click="removeSentRequest(r.to)">Remove Request</button></li>
     </menu>
   </section>
-  <p v-else-if="loaded">No pending friend requests found.</p>
+  <p v-else-if="loaded" class="center-text">No pending friend requests found.</p>
   <p v-else>Loading...</p>
 
   <h2>Request Friend</h2>
@@ -197,5 +197,9 @@ form {
   text-align: center;
   display: flex;
   align-items: center;
+}
+
+.center-text {
+  text-align: center;
 }
 </style>

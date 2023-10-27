@@ -8,10 +8,9 @@ const { isLoggedIn, currentUsername } = storeToRefs(useUserStore());
 <template>
   <main>
     <section>
-      <h1 v-if="isLoggedIn">Welcome {{ currentUsername }}!</h1>
+      <h1 v-if="isLoggedIn">Your MyLifeLists</h1>
       <h1 v-else>Please login!</h1>
     </section>
-    <h1>Your Friends</h1>
     <ListofLabelsComponent />
   </main>
 </template>
