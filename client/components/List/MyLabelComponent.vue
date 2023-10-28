@@ -99,15 +99,6 @@ menu {
   margin: 0;
 }
 
-textarea {
-  font-family: inherit;
-  font-size: inherit;
-  height: 0.5em;
-  padding: 0.5em;
-  border-radius: 2px;
-  resize: none;
-}
-
 .friends {
   padding-bottom: 1em;
 }
@@ -124,10 +115,27 @@ textarea {
   justify-content: space-between;
   align-items: center;
 }
-
 .delete {
   display: flex;
   justify-content: flex-end;
+}
+
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  height: 0.5em;
+  padding: 0.5em;
+  margin-right: 0.5em;
+  border-radius: 2px;
+  resize: none;
+}
+
+form {
+  background-color: var(--base-bg);
+  border-radius: 1em;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
 }
 
 .base article:only-child {

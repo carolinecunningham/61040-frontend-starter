@@ -103,7 +103,7 @@ onBeforeMount(async () => {
   <div class="center">
     <form @submit.prevent="sendRequest(request_username)">
       <textarea id="username" v-model="request_username" instruction="Enter Username" required> </textarea>
-      <button class="pure-button btn-small pure-button-primary">Submit</button>
+      <button class="pure-button btn-small pure-button-primary">Send Friend Request</button>
     </form>
   </div>
 
@@ -125,7 +125,7 @@ onBeforeMount(async () => {
       <li><button class="pure-button btn-small pure-button-primary" @click="rejectRequest(r.from)">Reject Request</button></li>
     </menu>
   </section>
-  <p v-else-if="loaded" class="center-text">No incoming friend requests found.</p>
+  <p v-else-if="loaded" class="center-text">No pending friend requests found.</p>
   <p v-else>Loading...</p>
 
   <h2>Sent Requests</h2>
@@ -162,6 +162,16 @@ article {
   padding: 0.5em;
 }
 
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  height: 0.6em;
+  padding: 0.5em;
+  margin-right: 0.5em;
+  border-radius: 2px;
+  resize: none;
+}
+
 .friends {
   padding: 1em;
 }
@@ -190,8 +200,11 @@ h2 {
 form {
   display: flex;
   padding: 0.25em;
+  border-radius: 1em;
   margin: auto;
   align-items: center;
+  flex-direction: column;
+  gap: 1em;
 }
 .center {
   text-align: center;
