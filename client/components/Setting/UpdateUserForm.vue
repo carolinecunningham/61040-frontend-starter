@@ -47,9 +47,9 @@ async function updateSchool() {
 
   <form @submit.prevent="updateSchool" class="pure-form">
     <fieldset>
-      <legend>Update your school.</legend>
-      <input type="school" placeholder="School Name" v-model="school" required />
-      <button type="submit" class="pure-button pure-button-primary">Update your school</button>
+      <legend>Update your school</legend>
+      <input type="text" placeholder="School Name" v-model="school" required />
+      <button type="submit" class="pure-button pure-button-primary">Update school</button>
     </fieldset>
   </form>
 </template>
