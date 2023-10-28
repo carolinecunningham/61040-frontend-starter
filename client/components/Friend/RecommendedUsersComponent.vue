@@ -55,7 +55,9 @@ async function updateFriendsRecs() {
 
 onBeforeMount(async () => {
   await getRecommendedFriends();
-  await updateShown(startingIdx, numToShow);
+  if (totalNumSuggestions > 0) {
+    await updateShown(startingIdx, numToShow);
+  }
   loaded.value = true;
 });
 </script>
@@ -69,7 +71,7 @@ onBeforeMount(async () => {
       <p :f="friendsDisplay">{{ f }}</p>
     </menu>
   </section>
-  <p v-else-if="loaded">No recommended friends found.</p>
+  <p v-else-if="loaded" class="center">No recommended friends found.</p>
   <p v-else>Loading...</p>
   <div v-if="moreSuggestionsLeft()" class="center">
     <button class="pure-button btn-small pure-button-primary" @click="updateShown(startingIdx, numToShow)">Next Page of Suggestions</button>

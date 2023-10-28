@@ -156,9 +156,12 @@ export default class FilteringConcept {
   // }
 
   public getRecReason(user_id: ObjectId, usersShareSchool: ObjectId[], usersShareHometown: ObjectId[]) {
-    if (usersShareSchool.indexOf(user_id) !== -1 && usersShareHometown.indexOf(user_id) !== -1) {
+    const usersShareSchoolStr = usersShareSchool.map((item) => item.toString());
+    const usersShareHometownStr = usersShareHometown.map((item) => item.toString());
+
+    if (usersShareSchoolStr.indexOf(user_id.toString()) !== -1 && usersShareHometownStr.indexOf(user_id.toString()) !== -1) {
       return 2; // school and hometown
-    } else if (usersShareSchool.indexOf(user_id) !== -1) {
+    } else if (usersShareSchoolStr.indexOf(user_id.toString()) !== -1) {
       return 1; // school
     } else {
       return 0; // hometown

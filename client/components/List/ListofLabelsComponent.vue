@@ -49,7 +49,7 @@ onBeforeMount(async () => {
       <MyLabelComponent v-if="editing !== l._id" :label="l" @refreshLabels="getLabels" @editLabel="updateEditing" />
     </article>
   </section>
-  <p v-else-if="loaded">No labels found. Create a labels and you can see it here!</p>
+  <p v-else-if="loaded" class="center">No labels found. Create a labels and you can see it here!</p>
   <p v-else>Loading...</p>
 </template>
 
@@ -58,6 +58,10 @@ section {
   display: flex;
   flex-direction: column;
   gap: 1em;
+}
+
+.center {
+  text-align: center;
 }
 
 section,
