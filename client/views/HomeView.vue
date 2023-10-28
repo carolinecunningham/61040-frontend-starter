@@ -30,6 +30,8 @@ h1 {
 
 .center {
   text-align: center;
+  margin-left: 10em;
+  margin-right: 10em;
   font-family: "Verdana";
 }
 </style>
