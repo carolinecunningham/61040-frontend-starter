@@ -53,3 +53,19 @@ async function updateSchool() {
     </fieldset>
   </form>
 </template>
+
+<style scoped>
+button {
+  background-color: #7fb285;
+  font-family: "Verdana";
+}
+
+input {
+  font-family: "Verdana";
+}
+
+legend,
+h2 {
+  font-family: "Verdana";
+}
+</style>

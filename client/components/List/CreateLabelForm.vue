@@ -33,7 +33,7 @@ const emptyForm = () => {
 
 <style scoped>
 form {
-  background-color: var(--base-bg);
+  background-color: #f7f0f5;
   border-radius: 1em;
   display: flex;
   flex-direction: column;
@@ -41,12 +41,21 @@ form {
   padding: 1em;
 }
 
+label {
+  font-family: "Verdana";
+}
+
 textarea {
-  font-family: inherit;
+  font-family: "Verdana";
   font-size: inherit;
   height: 1em;
   padding: 0.5em;
   border-radius: 2px;
   resize: none;
+}
+
+button {
+  background-color: #7fb285;
+  font-family: "Verdana";
 }
 </style>

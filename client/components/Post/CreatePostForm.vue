@@ -16,8 +16,6 @@ const emit = defineEmits(["refreshPosts"]);
 
 const createPost = async (content: string, prompt: number, audienceLabel?: string) => {
   let body;
-  console.log("AUDIENCE");
-  console.log(audienceLabel);
   if (audienceLabel) {
     body = { content, prompt, audienceLabel };
   } else {
@@ -61,7 +59,7 @@ const emptyForm = () => {
 
 <style scoped>
 form {
-  background-color: var(--base-bg);
+  background-color: #f7f0f5;
   border-radius: 1em;
   display: flex;
   flex-direction: column;
@@ -69,8 +67,17 @@ form {
   padding: 1em;
 }
 
+label {
+  font-family: "Verdana";
+}
+
+button {
+  font-family: "Verdana";
+  background-color: #7fb285;
+}
+
 textarea {
-  font-family: inherit;
+  font-family: "Verdana";
   font-size: inherit;
   height: 6em;
   padding: 0.5em;

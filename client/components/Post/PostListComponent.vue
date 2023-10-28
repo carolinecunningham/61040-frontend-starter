@@ -108,23 +108,30 @@ section {
 }
 
 section,
-p,
+p {
+  font-family: "Verdana";
+}
 .row {
   margin: 0 auto;
   max-width: 60em;
 }
 
 article {
-  background-color: var(--base-bg);
+  background-color: #f7f0f5;
   border-radius: 1em;
   display: flex;
   flex-direction: column;
   gap: 0.5em;
   padding: 1em;
+  font-family: "Verdana";
 }
 
 .center {
   text-align: center;
+}
+
+.option {
+  font-family: "Verdana";
 }
 
 .posts {
@@ -133,6 +140,9 @@ article {
 
 legend {
   margin-left: 650px;
+  font-family: "Verdana";
+  text-align: left;
+  justify-content: space-between;
 }
 
 .row {

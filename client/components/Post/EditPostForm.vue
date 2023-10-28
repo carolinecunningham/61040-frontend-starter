@@ -35,14 +35,14 @@ const editPost = async (content: string) => {
 
 <style scoped>
 form {
-  background-color: var(--base-bg);
+  background-color: #f7f0f5;
   display: flex;
   flex-direction: column;
   gap: 0.5em;
 }
 
 textarea {
-  font-family: inherit;
+  font-family: Verdana;
   font-size: inherit;
   height: 6em;
   border-radius: 4px;

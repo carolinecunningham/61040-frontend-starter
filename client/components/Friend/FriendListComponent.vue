@@ -146,6 +146,11 @@ section {
   gap: 1em;
 }
 
+button {
+  background-color: #7fb285;
+  font-family: "Verdana";
+}
+
 section,
 p,
 .row {
@@ -154,7 +159,7 @@ p,
 }
 
 article {
-  background-color: var(--base-bg);
+  background-color: #f7f0f5;
   border-radius: 1em;
   display: flex;
   flex-direction: column;
@@ -163,7 +168,7 @@ article {
 }
 
 textarea {
-  font-family: inherit;
+  font-family: "Verdana";
   font-size: inherit;
   height: 0.6em;
   padding: 0.5em;
@@ -184,7 +189,7 @@ textarea {
 }
 
 menu {
-  background-color: var(--base-bg);
+  background-color: #f7f0f5;
   list-style-type: none;
   display: flex;
   flex-direction: row;
@@ -195,6 +200,7 @@ menu {
 
 h2 {
   text-align: center;
+  font-family: "Verdana";
 }
 
 form {
@@ -214,5 +220,9 @@ form {
 
 .center-text {
   text-align: center;
+}
+
+p {
+  font-family: "Verdana";
 }
 </style>

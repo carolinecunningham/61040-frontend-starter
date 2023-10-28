@@ -83,6 +83,7 @@ onBeforeMount(async () => {
 <style scoped>
 p {
   margin: 0em;
+  font-family: "Verdana";
 }
 
 .Name {
@@ -121,7 +122,7 @@ menu {
 }
 
 textarea {
-  font-family: inherit;
+  font-family: "Verdana";
   font-size: inherit;
   height: 0.5em;
   padding: 0.5em;
@@ -131,7 +132,7 @@ textarea {
 }
 
 form {
-  background-color: var(--base-bg);
+  background-color: #f7f0f5;
   border-radius: 1em;
   display: flex;
   flex-direction: row;
@@ -140,5 +141,10 @@ form {
 
 .base article:only-child {
   margin-left: auto;
+}
+
+button {
+  background-color: #7fb285;
+  font-family: "Verdana";
 }
 </style>

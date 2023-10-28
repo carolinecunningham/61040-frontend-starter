@@ -94,7 +94,7 @@ p,
 }
 
 article {
-  background-color: var(--base-bg);
+  background-color: #f7f0f5;
   border-radius: 1em;
   display: flex;
   flex-direction: column;
@@ -115,6 +115,7 @@ article {
 
 h2 {
   text-align: center;
+  font-family: Verdana;
 }
 
 .center {
@@ -122,12 +123,17 @@ h2 {
 }
 
 menu {
-  background-color: var(--base-bg);
+  background-color: #f7f0f5;
   list-style-type: none;
   display: flex;
   flex-direction: row;
   gap: 1em;
   padding: 0.25em;
   margin: 0;
+}
+
+button {
+  background-color: #7fb285;
+  font-family: "Verdana";
 }
 </style>

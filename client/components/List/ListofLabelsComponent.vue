@@ -68,7 +68,7 @@ p,
 }
 
 article {
-  background-color: var(--base-bg);
+  background-color: #f7f0f5;
   border-radius: 1em;
   display: flex;
   flex-direction: column;
@@ -89,5 +89,11 @@ article {
 
 h2 {
   text-align: center;
+  font-family: "Verdana";
+}
+
+button {
+  background-color: #7fb285;
+  font-family: "Verdana";
 }
 </style>

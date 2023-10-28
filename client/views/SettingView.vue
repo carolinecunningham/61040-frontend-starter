@@ -26,3 +26,9 @@ async function delete_() {
     <UpdateUserForm />
   </main>
 </template>
+
+<style scoped>
+h1 {
+  font-family: "Verdana";
+}
+</style>

@@ -25,9 +25,11 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 <style scoped>
 h1 {
   text-align: center;
+  font-family: "Verdana";
 }
 
 .center {
   text-align: center;
+  font-family: "Verdana";
 }
 </style>
