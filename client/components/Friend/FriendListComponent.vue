@@ -99,6 +99,14 @@ onBeforeMount(async () => {
 </script>
 
 <template>
+  <h2>Send Friend Request</h2>
+  <div class="center">
+    <form @submit.prevent="sendRequest(request_username)">
+      <textarea id="username" v-model="request_username" instruction="Enter Username" required> </textarea>
+      <button class="pure-button btn-small pure-button-primary">Submit</button>
+    </form>
+  </div>
+
   <h2>Friends</h2>
   <section class="friends" v-if="loaded && Object.keys(friends).length !== 0">
     <menu v-for="f in Object.keys(friends)" :key="f">
@@ -106,7 +114,7 @@ onBeforeMount(async () => {
       <li><button class="pure-button btn-small pure-button-primary" @click="removeFriend(f)">Remove Friend</button></li>
     </menu>
   </section>
-  <p v-else-if="loaded" class="center-text">You currently have no friends</p>
+  <p v-else-if="loaded" class="center-text">Add a friend and you will see them here!</p>
   <p v-else>Loading...</p>
 
   <h2>Incoming Requests</h2>
@@ -117,7 +125,7 @@ onBeforeMount(async () => {
       <li><button class="pure-button btn-small pure-button-primary" @click="rejectRequest(r.from)">Reject Request</button></li>
     </menu>
   </section>
-  <p v-else-if="loaded" class="center-text">No pending friend requests found.</p>
+  <p v-else-if="loaded" class="center-text">No incoming friend requests found.</p>
   <p v-else>Loading...</p>
 
   <h2>Sent Requests</h2>
@@ -129,14 +137,6 @@ onBeforeMount(async () => {
   </section>
   <p v-else-if="loaded" class="center-text">No pending friend requests found.</p>
   <p v-else>Loading...</p>
-
-  <h2>Request Friend</h2>
-  <div class="center">
-    <form @submit.prevent="sendRequest(request_username)">
-      <textarea id="username" v-model="request_username" instruction="Enter Username" required> </textarea>
-      <button class="pure-button btn-small pure-button-primary">Send Friend Request</button>
-    </form>
-  </div>
 </template>
 
 <style scoped>

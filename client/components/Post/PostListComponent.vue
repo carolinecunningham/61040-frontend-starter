@@ -75,10 +75,10 @@ onBeforeMount(async () => {
       <EditPostForm v-else :post="userPost" @refreshPosts="getUsersPosts" @editPost="updateEditing" />
     </article>
   </section>
-  <p v-else-if="loaded" class="center">No posts found. Create a post and you can see it here!</p>
+  <p v-else-if="loaded" class="center">Create a post and you can see it here!</p>
   <p v-else>Loading...</p>
 
-  <h2>Feed</h2>
+  <h2>Friends' Posts</h2>
   <div class="row">
     <!-- {{ labels }} -->
     <!-- referenced https://stackoverflow.com/questions/43461752/how-to-render-array-to-select-option-vue-js -->

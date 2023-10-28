@@ -10,6 +10,7 @@ let friendsDisplay = ref<Array<Record<string, string>>>([]);
 
 let startingIdx = 0;
 const numToShow = 2;
+let totalNumSuggestions = 0;
 
 async function getRecommendedFriends(maxQuantity?: string) {
   let query: Record<string, string> = maxQuantity !== undefined ? { maxQuantity } : {};
@@ -21,6 +22,7 @@ async function getRecommendedFriends(maxQuantity?: string) {
     return;
   }
   recommendedFriends.value = friendResults;
+  totalNumSuggestions = Object.keys(recommendedFriends.value).length;
 }
 
 async function updateShown(startIdx: number, numShowInput: number) {
@@ -36,17 +38,18 @@ async function updateShown(startIdx: number, numShowInput: number) {
   try {
     friendResults = await fetchy("/api/filter/recommendedUsers/", "PUT", { query });
   } catch (_) {
-    console.log("ERRR");
     return;
   }
-  startingIdx += numShowInput;
+  startingIdx = startIdx + numShowInput;
   friendsDisplay.value = friendResults;
 }
 
+function moreSuggestionsLeft() {
+  return !(startingIdx + numToShow > totalNumSuggestions);
+}
+
 async function updateFriendsRecs() {
-  console.log("UPDATE");
   await getRecommendedFriends();
-  console.log(recommendedFriends);
   // await updateShown(startingIdx, numToShow);
 }
 
@@ -68,8 +71,11 @@ onBeforeMount(async () => {
   </section>
   <p v-else-if="loaded">No recommended friends found.</p>
   <p v-else>Loading...</p>
-  <div class="center">
-    <button class="pure-button btn-small pure-button-primary" @click="updateShown(startingIdx, numToShow)">See More Suggestions</button>
+  <div v-if="moreSuggestionsLeft()" class="center">
+    <button class="pure-button btn-small pure-button-primary" @click="updateShown(startingIdx, numToShow)">Next Page of Suggestions</button>
+  </div>
+  <div v-else class="center">
+    <button class="pure-button btn-small pure-button-primary" @click="updateShown(0, numToShow)">Back to Beginning</button>
   </div>
 </template>
 
