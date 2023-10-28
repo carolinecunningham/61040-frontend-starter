@@ -96,7 +96,7 @@ onBeforeMount(async () => {
       <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getFeedPosts" @editPost="updateEditing" />
     </article>
   </section>
-  <p v-else-if="loaded">No posts found</p>
+  <p class="center" v-else-if="loaded">No posts found</p>
   <p v-else>Loading...</p>
 </template>
 
