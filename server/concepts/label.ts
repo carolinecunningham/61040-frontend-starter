@@ -42,8 +42,9 @@ export default class LabelConcept {
     if (label !== null) {
       const label_items = label.items;
       if (label_items !== undefined) {
-        const idx = label_items.indexOf(item);
-        label_items.splice(idx);
+        const label_items_strs = label_items.map((item) => item.toString());
+        const idx = label_items_strs.indexOf(item.toString());
+        label_items.splice(idx, 1);
         await this.labels.updateOne({ _id }, { items: label_items });
         return { msg: "Deleted item from list" };
       }
