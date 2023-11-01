@@ -20,7 +20,6 @@ let filterLabel = ref("");
 
 async function getFeedPosts(label?: string) {
   let query: Record<string, string> = label !== undefined ? { label } : {};
-  console.log(label);
   let postResults;
   try {
     postResults = await fetchy("/api/feed", "GET", { query });

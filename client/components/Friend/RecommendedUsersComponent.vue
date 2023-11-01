@@ -22,6 +22,8 @@ async function getRecommendedFriends(maxQuantity?: string) {
     return;
   }
   recommendedFriends.value = friendResults;
+  console.log("keys");
+  console.log(Object.keys(recommendedFriends.value));
   totalNumSuggestions = Object.keys(recommendedFriends.value).length;
 }
 
@@ -56,6 +58,8 @@ async function updateFriendsRecs() {
 onBeforeMount(async () => {
   await getRecommendedFriends();
   if (totalNumSuggestions > 0) {
+    console.log("REACHED");
+    console.log(totalNumSuggestions);
     await updateShown(startingIdx, numToShow);
   }
   loaded.value = true;

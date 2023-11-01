@@ -56,6 +56,8 @@ export default class LabelConcept {
   }
 
   async getLabelItems(_id: ObjectId) {
+    console.log("ID");
+    console.log(_id);
     const label = await this.labels.readOne({ _id });
     if (label !== null) {
       if (label.items !== undefined) {
@@ -108,7 +110,7 @@ export default class LabelConcept {
       throw new LabelNotFound(_id);
     }
     if (label.items === undefined) {
-      throw new NotAllowedError("Label is empty");
+      return;
     } else {
       const items_string = label.items.map((item) => item.toString());
       if (items_string.indexOf(item.toString()) !== -1) {

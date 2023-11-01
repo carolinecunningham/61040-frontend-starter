@@ -117,7 +117,7 @@ export default class FilteringConcept {
     // console.log(onlyInFilter2);
     // referenced https://stackoverflow.com/questions/60041413/typescript-number-addition-0-1-returns-01
 
-    const recItems = this.recommended_items.readOne({ owner });
+    const recItems = await this.recommended_items.readOne({ owner });
     if (!recItems) {
       await this.recommended_items.createOne({ owner, recommendedItems });
     } else {

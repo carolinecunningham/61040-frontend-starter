@@ -283,12 +283,19 @@ class Routes {
       for (const post of postsWithAudience) {
         // console.log("REACHED");
         if (post.audience) {
+          console.log("AUDIENCE");
+          console.log(post.audience);
           // get label items in audience
-          const labelItems = await Label.getLabelItems(post.audience);
-          const labelItemsStr = labelItems.map((user_id) => user_id.toString());
-          if (labelItemsStr.indexOf(user.toString()) !== -1) {
-            // user in specified audience to see post
-            await Feed.addToFeed(user, post);
+          try {
+            const labelItems = await Label.getLabelItems(post.audience);
+            const labelItemsStr = labelItems.map((user_id) => user_id.toString());
+            if (labelItemsStr.indexOf(user.toString()) !== -1) {
+              // user in specified audience to see post
+              await Feed.addToFeed(user, post);
+            }
+          } catch {
+            // continue showing rest of posts
+            continue;
           }
         } else {
           await Feed.addToFeed(user, post);
